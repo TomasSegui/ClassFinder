@@ -14,7 +14,7 @@ model users {
   password  String
   username  String
   profesor  Boolean  @default(false)
-  pfp       String
+  pfp       String?
   profesion String?
   carrera   String?
   desc      String   @default("Hola, esta es mi descripción.")
