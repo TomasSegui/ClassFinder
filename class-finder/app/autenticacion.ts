@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -22,8 +22,8 @@ export default NextAuth({
           where: { email: credentials.email },
         });
 
-        if (users && bcrypt.compareSync(credentials.password, users.password)) {
-          return { id: users.id, name: users.username, email: users.email };
+        if (user && bcrypt.compareSync(credentials.password, user.password)) {
+          return { id: user.id, name: user.username, email: user.email };
         } else {
           return null;
         }

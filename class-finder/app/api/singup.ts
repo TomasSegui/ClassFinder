@@ -1,46 +1,46 @@
-// import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-export default async (req: any, res: any) => {
+export default async function handler(req:any, res:any) {
   if (req.method === 'POST') {
     const { email, password, username, profesor, pfp, profesion, carrera, desc, barrio, precio, materia, idsCampus } = req.body;
 
-    // Verificar si el usuario ya existe
-    const existingUser = await prisma.users.findUnique({
-      where: { email },
-    });
+    try {
+      const existingUser = await prisma.users.findUnique({
+        where: { email },
+      });
 
-    if (existingUser) {
-      res.status(400).json({ error: 'User already exists' });
-      return;
+      if (existingUser) {
+        return res.status(400).json({ error: 'El usuario ya existe' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const user = await prisma.users.create({
+        data: {
+          email,
+          password: hashedPassword,
+          username,
+          profesor: profesor || false,
+          pfp,
+          profesion,
+          carrera,
+          desc: desc || "Hola, esta es mi descripción.",
+          barrio,
+          precio,
+          materia,
+          idsCampus
+        },
+      });
+
+      return res.status(201).header('Content-Type', 'application/json').json(user);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).header('Content-Type', 'application/json').json({ error: 'Error interno del servidor' });
     }
-
-    // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crear el nuevo usuario
-    const user = await prisma.users.create({
-      data: {
-        email,
-        password: hashedPassword,
-        username,
-        profesor: profesor || false,
-        pfp,
-        profesion,
-        carrera,
-        desc: desc || "Hola, esta es mi descripción.",
-        barrio,
-        precio,
-        materia,
-        idsCampus
-      },
-    });
-
-    res.status(201).json(user);
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).header('Content-Type', 'application/json').json({ error: 'Método no permitido' });
   }
-};
+}
