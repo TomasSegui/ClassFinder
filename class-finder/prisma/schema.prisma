@@ -6,15 +6,22 @@
 
 generator client {
   provider = "prisma-client-js"
+  url      = "(function)"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model users {
   id        Int      @unique @default(autoincrement())
-  email     String   @unique
+  email     String
   password  String
   username  String
   profesor  Boolean  @default(false)
-  pfp       String?
+  pfp       String
   profesion String?
   carrera   String?
   desc      String   @default("Hola, esta es mi descripción.")
@@ -27,8 +34,8 @@ model users {
 model campus {
   id           Int    @unique @default(autoincrement())
   id_profe     Int
-  posts        post[]
   ids_usuarios Int[]
+  posts        post[]
 }
 
 model post {
@@ -38,12 +45,5 @@ model post {
   fecha     DateTime
   file      String
   id_campus Int
-
-  campus campus @relation(fields: [id_campus], references: [id])
-}
-
-datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  campus    campus   @relation(fields: [id_campus], references: [id])
 }
