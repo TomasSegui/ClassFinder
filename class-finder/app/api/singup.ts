@@ -1,3 +1,4 @@
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -55,8 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       const existingUser = await prisma.users.findUnique({
-        where: { email },
-      });
+  where: { id: email },
+});
 
       if (existingUser) {
         return res.status(400).json({ error: 'El usuario ya existe' });
